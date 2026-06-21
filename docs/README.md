@@ -1,101 +1,54 @@
-# job_seeker_ro_spider
+# job_seeker_ro_spider — UTILBEN SRL Scraper
 
-**job_seeker_ro_spider** — scraper pentru job-urile EPAM Systems din România.
+**job_seeker_ro_spider** — scraper pentru job-urile UTILBEN SRL din România.
 
-Extrage anunțurile de pe [EPAM Careers Romania](https://careers.epam.com/en/jobs/romania) și le publică în [peviitor.ro](https://peviitor.ro) prin API-ul SOLR.
+Extrage anunțurile de pe [eJobs.ro](https://www.ejobs.ro/company/utilben/123016) și [ANOFM](https://www.anofm.ro) și le publică în [peviitor.ro](https://peviitor.ro) prin API-ul SOLR.
 
-## Identificare
+## Cum funcționează
 
-Toate request-urile HTTP folosesc User-Agent-ul:
+1. **Validează compania** — interoghează API-ul public ANAF ([demoanaf.ro](https://demoanaf.ro)) după CIF-ul UTILBEN (18643343) și verifică:
+   - Denumirea oficială: UTILBEN SRL
+   - Status activ
+2. **Scrape-uiește job-urile** — extrage lista de job-uri de pe eJobs.ro (pagina companiei) și de pe ANOFM
+3. **Salvează în SOLR** — upsert în baza de date SOLR pentru peviitor.ro
+4. **Raportează** — generează docs/jobs.md și actualizează pagina live
 
-```
-job_seeker_ro_spider
-```
+## Surse de date
 
-## Ce face
+| Sursă | URL | Tip |
+|-------|-----|-----|
+| eJobs.ro | `https://www.ejobs.ro/company/utilben/123016` | HTML (cheerio) |
+| ANOFM | `https://mediere.anofm.ro/api/entity/vw_public_job_posting` | API JSON |
+| ANAF | `https://demoanaf.ro/api/company/18643343` | API JSON (validare) |
 
-1. **Validează compania** — interoghează API-ul public ANAF ([demoanaf.ro](https://demoanaf.ro)) după CIF-ul EPAM (33159615) și verifică:
-   - Denumirea oficială: EPAM SYSTEMS INTERNATIONAL SRL
-   - Status: activ/inactiv/radiat
-   - Adresa completă din registrul comerțului
-2. **Cross-validează cu Peviitor** — verifică existența companiei în API-ul Peviitor
-3. **Scrape-uiește job-urile** — extrage lista completă de job-uri din API-ul public EPAM Careers, filtrat pe România
-4. **Transformă datele** — normalizează locațiile (doar orașe românești), tag-urile (lowercase), workmode-ul (remote/on-site/hybrid)
-5. **Stochează în SOLR** — upsert în `job` core (job-urile) și `company` core (datele companiei cu adresa completă)
-6. **Generează docs/jobs.md** — fișier markdown cu informații companie + toate job-urile curente, publicat pe [GitHub Pages](https://sebiboga.github.io/epam-systems-international-srl-nodejs-scraper/jobs.md)
+## eJobs.ro
 
-## Structură proiect
+Se extrage pagina de profil a companiei și se parsează card-urile de job-uri cu cheerio.
 
-```
-├── config/company.json         # Sursa unică de adevăr (CIF, brand, URL-uri, API)
-├── config/company.js           # Loader ESM pentru config/company.json
-├── index.js                    # Orchestrator principal
-├── company.js                  # Validare companie (ANAF + Peviitor + SOLR) cu cache 7 zile
-├── demoanaf.js                 # CLI wrapper pentru src/anaf.js
-├── src/anaf.js                 # Modul ANAF API (search + company details)
-├── src/markdown-generator.js   # Generează docs/jobs.md după scrape
-├── src/job-validator.js        # Primitivă comună: validateByHead, validateByContent
-├── solr.js                     # Operații SOLR (query, upsert, delete, company)
-├── company.json                # Cache ANAF (committed, TTL 7 zile, fallback la stale)
-├── ROBOTS.md          # Analiză robots.txt și politici de scraping
-├── tests/
-│   ├── unit/          # 56 teste unitare (API-uri mock-uite)
-│   ├── integration/   # 16 teste de integrare (ANAF + SOLR live)
-│   └── e2e/           # 13 teste end-to-end (pipelin complet)
-└── .github/workflows/
-    ├── job-seeker-ro-spider.yml     # Rulează zilnic la 6 AM UTC
-    └── automation-testing.yml       # Teste automate la fiecare push/PR
-```
+## ANOFM
 
-## API-uri folosite
-
-| API | URL | Autentificare |
-|---|---|---|
-| EPAM Careers | `https://careers.epam.com/api/jobs/v2/search/...` | Public |
-| ANAF (demoanaf) | `https://demoanaf.ro/api/...` | Public |
-| Peviitor | `https://api.peviitor.ro/v1/company/` | Public |
-| SOLR (job core) | `https://solr.peviitor.ro/solr/job` | `SOLR_AUTH` |
-| SOLR (company core) | `https://solr.peviitor.ro/solr/company` | `SOLR_AUTH` |
+API-ul public ANOFM se interoghează cu CIF-ul companiei pentru a găsi job-uri asociate.
 
 ## Robots.txt
 
-EPAM Careers [robots.txt](https://careers.epam.com/robots.txt) dezactivează:
-- `/api/*` — API-ul JSON folosit de scraper
-- `/*/vacancy/*` — paginile individuale de job
+Acest scraper respectă robots.txt al surselor. Vezi [ROBOTS.md](ROBOTS.md).
 
-Scraper-ul folosește API-ul cu rate limiting (1s delay între pagini, 10 job-uri/cerere) și un singur User-Agent identificabil. Paginile individuale de job sunt doar verificate (HEAD request), nu parse-uite.
-
-Pentru analiza completă, vezi [ROBOTS.md](../ROBOTS.md).
-
-## 🌱 Derived Scrapers
-
-Acest template a fost folosit pentru a deriva scraper-e pentru alte companii:
-
-| Repo | Companie | CIF | Metodă | Status |
-|------|----------|-----|--------|--------|
-| [mejix-srl-nodejs-scraper](https://github.com/sebiboga/mejix-srl-nodejs-scraper) | MEJIX SRL | 17372688 | HTML scraping (cheerio) | ✅ Live |
-| [talent-matchmakers-srl-nodejs-scraper](https://github.com/sebiboga/talent-matchmakers-srl-nodejs-scraper) | TALENT MATCHMAKERS S.R.L. | 38460545 | Teamtailor HTML (cheerio) | ✅ Live |
-| [artsoft-consult-srl-nodejs-scraper](https://github.com/sebiboga/artsoft-consult-srl-nodejs-scraper) | ARTSOFT CONSULT SRL | 15997630 | HTML scraping (cheerio) | ✅ Live |
-| [rapel-srl-nodejs-scraper](https://github.com/sebiboga/rapel-srl-nodejs-scraper) | RAPEL SRL | 5665609 | jobRapid.ro HTML + ANOFM API | ✅ Live |
-| [continental-hotels-srl-nodejs-scraper](https://github.com/sebiboga/continental-hotels-srl-nodejs-scraper) | CONTINENTAL HOTELS SA | 1559737 | POST AJAX → HTML (cheerio) | ✅ Live |
-| [coera-bc-srl-nodejs-scraper](https://github.com/sebiboga/coera-bc-srl-nodejs-scraper) | COERA BC SRL | 32519996 | HTML scraping (cheerio) | ✅ Live |
-
-**Pitfall #12 — ANOFM job scraping by CIF:** API-ul public ANOFM (`/api/entity/vw_public_job_posting`) oferă job-uri gratis filtrate pe CIF. Adăugați `searchANOFM(cif)` în scraper pentru a nu pierde job-uri de pe această platformă. Location se returnează ca array (`[loc]`).
-
-## Testare
+## Run
 
 ```bash
-# Toate testele
-npm test
+# Normal run (full scrape)
+npm run scrape
 
-# Doar unitare
-npm run test:unit
-
-# Doar integrare (necesită ANAF live, SOLR conditional)
-npm run test:integration
-
-# Doar E2E (API real EPAM + ANAF + SOLR)
-npm run test:e2e
+# Test mode (single page, no ANOFM)
+npm run scrape -- --test
 ```
 
-Testele SOLR folosesc `itIfSolr` — se auto-skip dacă variabila `SOLR_AUTH` nu e setată.
+## Teste
+
+```bash
+npm test                 # all tests
+npm run test:unit        # unit tests
+npm run test:integration # integration tests (requires SOLR_AUTH)
+npm run test:e2e         # end-to-end tests (requires SOLR_AUTH)
+npm run test:consistency # consistency checks
+```

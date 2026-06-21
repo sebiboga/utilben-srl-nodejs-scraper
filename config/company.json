@@ -1,11 +1,11 @@
 {
-  "cif": "33159615",
-  "legalName": "EPAM SYSTEMS INTERNATIONAL SRL",
-  "brand": "EPAM",
-  "website": "https://www.epam.com",
-  "careerUrl": "https://careers.epam.com",
-  "apiBase": "https://careers.epam.com",
-  "apiCountryId": "8150000000000001155",
-  "defaultLocation": "București",
-  "scraperFile": "https://raw.githubusercontent.com/sebiboga/epam-systems-international-srl-nodejs-scraper/main/.github/workflows/job-seeker-ro-spider.yml"
+  "cif": "18643343",
+  "legalName": "UTILBEN SRL",
+  "brand": "Utilben",
+  "website": "https://www.utilben.ro",
+  "careerUrl": "https://www.utilben.ro/careers",
+  "apiBase": "https://www.utilben.ro",
+  "apiEndpoint": "",
+  "defaultLocation": "Cluj-Napoca",
+  "scraperFile": "https://raw.githubusercontent.com/sebiboga/utilben-srl-nodejs-scraper/main/.github/workflows/job-seeker-ro-spider.yml"
 }
