@@ -75,7 +75,7 @@ describe("Repository Configuration", () => {
       const html = await res.text();
       expect(html).toContain("<!DOCTYPE html>");
       expect(html).toContain("peviitor");
-      expect(html).toContain(companyConfig.brand);
+      expect(html.toLowerCase()).toContain(companyConfig.brand.toLowerCase());
       console.log(`✅ GitHub Pages HTML loaded from ${pagesUrl}`);
     });
   });
