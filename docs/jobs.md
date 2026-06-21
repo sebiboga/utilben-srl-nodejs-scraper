@@ -14,7 +14,7 @@
 
 ## Current Job Listings (6)
 
-_Generated: 2026-06-21T05:48:06.311Z_
+_Generated: 2026-06-21T09:52:46.323Z_
 
 ### Contabil senior / Coordonator contabilitate
 
