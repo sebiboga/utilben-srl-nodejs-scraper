@@ -10,11 +10,11 @@
 | Location | Calea ARMATEI ROMÂNE, 78, Municipiul Carei, Satu Mare |
 | Website | [https://www.utilben.ro](https://www.utilben.ro) |
 | Careers | [https://www.utilben.ro/careers](https://www.utilben.ro/careers) |
-| Last Scraped | 2026-06-22 |
+| Last Scraped | 2026-06-23 |
 
 ## Current Job Listings (6)
 
-_Generated: 2026-06-22T11:58:50.077Z_
+_Generated: 2026-06-23T09:42:53.744Z_
 
 ### Contabil senior / Coordonator contabilitate
 
