@@ -10,11 +10,11 @@
 | Location | Calea ARMATEI ROMÂNE, 78, Municipiul Carei, Satu Mare |
 | Website | [https://www.utilben.ro](https://www.utilben.ro) |
 | Careers | [https://www.utilben.ro/careers](https://www.utilben.ro/careers) |
-| Last Scraped | 2026-06-28 |
+| Last Scraped | 2026-06-29 |
 
 ## Current Job Listings (6)
 
-_Generated: 2026-06-28T08:54:42.607Z_
+_Generated: 2026-06-29T11:03:18.248Z_
 
 ### Consultant Vanzari- Utilaje Municipale - Sud-ul Romaniei
 
